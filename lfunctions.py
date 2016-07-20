@@ -2,7 +2,7 @@
 import functions
 
 
-class DbPfaDgc:
+class DbPfDg:
 
 
     def gen_accidents_table(self, csv_path):
