@@ -10,12 +10,12 @@ class DbPfDg:
         dict_lst = functions.csv_to_dict_list(csv_path)
         res = []
         for dict in dict_lst:
-            dn = self.normalize_values(dict)
+            dn = self.normalize_initial_values(dict)
             res.append(dn)
         functions.dicts_to_csv(res)
 
 
-    def normalize_values(self, dict):
+    def normalize_initial_values(self, dict):
         for key in dict.keys():
             if recoding.is_no_data(dict[key]):
                 dict[key] = ''
