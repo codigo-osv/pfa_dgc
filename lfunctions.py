@@ -1,8 +1,42 @@
 # -*- coding: UTF-8 -*-
 import functions
-
-
+import recoding
+from recoding import is_no_data
 class DbPfDg:
+
+
+    def normalize_values_lst(self, csv_path):
+        dict_lst = rows = functions.csv_to_dict_list(csv_path)
+        res = []
+        for dict in dict_lst:
+            dn = self.normalize_values(dict)
+            res.append(dn)
+        functions.dicts_to_csv(res)
+
+
+    def normalize_values(self, dict):
+        for key in dict.keys():
+            if is_no_data(dict[key]):
+                dict[key] = ''
+            elif dict[key] == "AVENIDA + AUTOPISTA":
+                dict[key] = 'AUTOPISTA'
+            elif dict[key] == 'AUTO (no se especifica si es particular o de alquiler)':
+                dict[key] = 'AUTO'
+            elif dict[key] == 'AUTO PFA / MOVIL / GENDARMERIA / METROPOLITANA / MOTO MOVIL':
+                dict[key] = 'FUERZA SEGURIDAD'
+            elif dict[key] == 'CONDUCTOR (A/P-A/A-MOTO-CICLOMOTOR-T/P-CAMION-UTILITARIO)':
+                dict[key] = 'CONDUCTOR'
+            elif dict[key] == 'PASAJERO/ACOMPAÑANTE (A/P-A/A-MOTO-CICLOMOTOR-T/P-CAMION-UTILITARIO)':
+                dict[key] = 'PASAJERO'
+            elif 'PASAJERO/ACOMPAÑANTE' in dict[key]:
+                dict[key] = dict[key].replace('PASAJERO/ACOMPAÑANTE', 'PASAJERO')
+            elif 'PASAJERO/ ACOMPAÑANTE' in dict[key]:
+                dict[key] = dict[key].replace('PASAJERO/ ACOMPAÑANTE', 'PASAJERO')
+            elif 'PASAJERO/ACOMPAïż½ANTE' in dict[key]:
+                dict[key] = dict[key].replace('PASAJERO/ACOMPAïż½ANTE', 'PASAJERO')
+            elif 'PASAJERO/ ACOMPAïż½ANTE' in dict[key]:
+                dict[key] = dict[key].replace('PASAJERO/ ACOMPAïż½ANTE', 'PASAJERO')
+        return dict
 
 
     def gen_accidents_table(self, csv_path):
