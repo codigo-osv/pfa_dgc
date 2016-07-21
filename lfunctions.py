@@ -1,7 +1,8 @@
 # -*- coding: UTF-8 -*-
 import functions
 import recoding
-from recoding import is_no_data
+
+
 class DbPfDg:
 
 
@@ -16,9 +17,9 @@ class DbPfDg:
 
     def normalize_values(self, dict):
         for key in dict.keys():
-            if is_no_data(dict[key]):
+            if recoding.is_no_data(dict[key]):
                 dict[key] = ''
-            elif dict[key] == "AVENIDA + AUTOPISTA":
+            elif dict[key] == 'AVENIDA + AUTOPISTA':
                 dict[key] = 'AUTOPISTA'
             elif dict[key] == 'AUTO (no se especifica si es particular o de alquiler)':
                 dict[key] = 'AUTO'
