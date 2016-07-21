@@ -7,7 +7,7 @@ class DbPfDg:
 
 
     def normalize_values_lst(self, csv_path):
-        dict_lst = rows = functions.csv_to_dict_list(csv_path)
+        dict_lst = functions.csv_to_dict_list(csv_path)
         res = []
         for dict in dict_lst:
             dn = self.normalize_values(dict)
