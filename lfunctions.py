@@ -1,13 +1,12 @@
 # -*- coding: UTF-8 -*-
 import functions
 import recoding
-import analysis
 
 
 class DbPfDg:
 
 
-    def normalize_ids(self, csv_path):
+    def normalize_accidents_ids(self, csv_path):
         dict_lst = functions.csv_to_dict_list(csv_path)
         query = functions.db.query('select max(id) from hechos')
         newid = int(query.all().__getitem__(0)[0])
@@ -91,7 +90,6 @@ class DbPfDg:
             cmp = (case['ID'],case['CAUSA'],case['EDAD_VICTIMA'],case['SEXO_VICTIMA'],case['VICTIMA'],case['TIPO_VEHICULO_VICTIMA'],case['MARCA_VEHICULO_VICTIMA'],case['MODELO_VEHICULO_VICTIMA'])
             if not cmp in res1:
                 id += 1
-                # idh = str(case['PERIODO']) + str(case['ID'])
                 res1.append(cmp)
                 formatted = {"id_hecho" : case['ID'], "causa" : case['CAUSA'], "rol" : case['VICTIMA'], "tipo" : case['TIPO_VEHICULO_VICTIMA'], "marca" : case['MARCA_VEHICULO_VICTIMA'],
                              "modelo" : case['MODELO_VEHICULO_VICTIMA'], "colectivo" : case['COLECTIVO_VICTIMA'], "interno_colectivo" : case['INTERNO_VICTIMA'], "sexo" : case['SEXO_VICTIMA'],
@@ -112,7 +110,6 @@ class DbPfDg:
             cmp = (case['ID'],case['EDAD_ACUSADO'],case['SEXO_ACUSADO'],case['ACUSADO'],case['TIPO_VEHICULO_ACUSADO'],case['MARCA_VEHICULO_ACUSADO'],case['MODELO_VEHICULO_ACUSADO'])
             if not cmp in res1:
                 id += 1
-                # idh = str(case['PERIODO']) + str(case['ID'])
                 res1.append(cmp)
                 formatted = {"id_hecho" : case['ID'], "rol" : case['ACUSADO'], "tipo" : case['TIPO_VEHICULO_ACUSADO'], "marca" : case['MARCA_VEHICULO_ACUSADO'],
                              "modelo" : case['MODELO_VEHICULO_ACUSADO'], "colectivo" : case['COLECTIVO_ACUSADO'], "interno_colectivo" : case['INTERNO_ACUSADO'], "sexo" : case['SEXO_ACUSADO'],
