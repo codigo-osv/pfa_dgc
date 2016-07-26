@@ -1,4 +1,5 @@
 # -*- coding: UTF-8 -*-
+import csv
 import functions
 import recoding
 
@@ -67,7 +68,6 @@ class DbPfDg:
             cmp = case['ID']
             if not cmp in res1:
                 res1.append(cmp)
-                # idh = str(case['PERIODO']) + str(case['ID'])
                 formatted = {"orden" : case['ORDEN'], "id" : cmp, "mes" : case['PERIODO'], "comisaria" : case['COMISARIA'], "fecha" : case['FECHA'],
                              "hora" : case['HORA'], "tipo_colision" : case['TIPO_COLISION'], "tipo_hecho" : case['TIPO_HECHO'], "lugar_hecho" : case['LUGAR_DEL_HECHO'],
                              "direccion_normalizada" : case['Dirección Normalizada'], "tipo_calle" : case['TIPO_DE_CALLE'],
@@ -76,7 +76,10 @@ class DbPfDg:
                              "geocodificacion" : case['Geocodificación']
                              }
                 res2.append(formatted)
-        functions.dicts_to_csv(res2)
+        ordrd_cols = ["orden", "id", "mes", "comisaria", "fecha", "hora", "tipo_colision", "tipo_hecho", "lugar_hecho", "direccion_normalizada", "tipo_calle",
+                      "direccion_normalizada_arcgis", "calle1", "altura", "calle2", "codigo_calle", "codigo_cruce", "geocodificacion"
+                     ]
+        self.dicts_to_csv_ordrd(res2, ordrd_cols)
 
 
     def gen_victims_table(self, csv_path):
@@ -96,7 +99,8 @@ class DbPfDg:
                              "edad" : case['EDAD_VICTIMA'], "sumario" : case['SRIO_NRO'], "id" : id
                             }
                 res2.append(formatted)
-        functions.dicts_to_csv(res2)
+        ordrd_cols = ["id_hecho", "causa", "rol", "tipo", "marca", "modelo", "colectivo", "interno_colectivo", "sexo", "edad", "sumario", "id"]
+        self.dicts_to_csv_ordrd(res2, ordrd_cols)
 
 
     def gen_accuseds_table(self, csv_path):
@@ -116,4 +120,14 @@ class DbPfDg:
                              "edad" : case['EDAD_ACUSADO'], "id" : id
                             }
                 res2.append(formatted)
-        functions.dicts_to_csv(res2)
+        ordrd_cols = ["id_hecho", "rol", "tipo", "marca", "modelo", "colectivo", "interno_colectivo", "sexo", "edad", "id"]
+        self.dicts_to_csv_ordrd(res2, ordrd_cols)
+
+
+    def dicts_to_csv_ordrd(self, row_dict_list, column_lst):
+        #precondition: all rows have the same columns
+        with open('resultado.csv', 'w') as fh:
+            wr = csv.DictWriter(fh, fieldnames=column_lst, delimiter=',', extrasaction='ignore', lineterminator='\n')
+            wr.writeheader()
+            for row in row_dict_list:
+                wr.writerow(row)
