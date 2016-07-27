@@ -1,5 +1,7 @@
 # -*- coding: UTF-8 -*-
 import csv
+from itertools import chain
+
 import functions
 import recoding
 
@@ -131,3 +133,12 @@ class DbPfDg:
             wr.writeheader()
             for row in row_dict_list:
                 wr.writerow(row)
+
+
+    def merge_csvs_ordrd(self, column_lst, *csv_path):
+        #precondition: all csvs and all rows have the same columns
+        rec = []
+        for csv in csv_path:
+            rec.append(functions.csv_to_dict_list(csv))
+        flattened = list(chain.from_iterable(rec))
+        self.dicts_to_csv_ordrd(flattened, column_lst)
