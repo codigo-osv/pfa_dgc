@@ -1,7 +1,6 @@
 # -*- coding: UTF-8 -*-
 import csv
 from itertools import chain
-
 import functions
 import recoding
 
@@ -92,10 +91,13 @@ class DbPfDg:
         id = int(query.all().__getitem__(0)[0])
         # create a tuple with the fields of each row to compare and check them to avoid adding duplicate entries
         for case in rows:
-            cmp = (case['ID'],case['CAUSA'],case['EDAD_VICTIMA'],case['SEXO_VICTIMA'],case['VICTIMA'],case['TIPO_VEHICULO_VICTIMA'],case['MARCA_VEHICULO_VICTIMA'],case['MODELO_VEHICULO_VICTIMA'])
-            if not cmp in res1:
+            cmp_dup = (case['ID'], case['CAUSA'], case['EDAD_VICTIMA'], case['SEXO_VICTIMA'], case['VICTIMA'], case['TIPO_VEHICULO_VICTIMA'], case['MARCA_VEHICULO_VICTIMA'], case['MODELO_VEHICULO_VICTIMA'])
+            cmp_emp = (case['CAUSA'], case['EDAD_VICTIMA'], case['SEXO_VICTIMA'], case['VICTIMA'], case['TIPO_VEHICULO_VICTIMA'],
+                       case['MARCA_VEHICULO_VICTIMA'], case['MODELO_VEHICULO_VICTIMA'], case['COLECTIVO_VICTIMA'], case['INTERNO_VICTIMA']
+                       )
+            if not ((cmp_dup in res1) or (self.blank_fields(cmp_emp))):
                 id += 1
-                res1.append(cmp)
+                res1.append(cmp_dup)
                 formatted = {"id_hecho" : case['ID'], "causa" : case['CAUSA'], "rol" : case['VICTIMA'], "tipo" : case['TIPO_VEHICULO_VICTIMA'], "marca" : case['MARCA_VEHICULO_VICTIMA'],
                              "modelo" : case['MODELO_VEHICULO_VICTIMA'], "colectivo" : case['COLECTIVO_VICTIMA'], "interno_colectivo" : case['INTERNO_VICTIMA'], "sexo" : case['SEXO_VICTIMA'],
                              "edad" : case['EDAD_VICTIMA'], "sumario" : case['SRIO_NRO'], "id" : id
@@ -113,17 +115,27 @@ class DbPfDg:
         id = int(query.all().__getitem__(0)[0])
         # create a tuple with the fields of each row to compare and check them to avoid adding duplicate entries
         for case in rows:
-            cmp = (case['ID'],case['EDAD_ACUSADO'],case['SEXO_ACUSADO'],case['ACUSADO'],case['TIPO_VEHICULO_ACUSADO'],case['MARCA_VEHICULO_ACUSADO'],case['MODELO_VEHICULO_ACUSADO'])
-            if not cmp in res1:
+            cmp_dup = (case['ID'], case['EDAD_ACUSADO'], case['SEXO_ACUSADO'], case['ACUSADO'], case['TIPO_VEHICULO_ACUSADO'], case['MARCA_VEHICULO_ACUSADO'], case['MODELO_VEHICULO_ACUSADO'])
+            cmp_emp = (case['EDAD_ACUSADO'], case['SEXO_ACUSADO'], case['ACUSADO'], case['TIPO_VEHICULO_ACUSADO'], case['MARCA_VEHICULO_ACUSADO'], case['MODELO_VEHICULO_ACUSADO'],
+                       case['COLECTIVO_ACUSADO'], case['INTERNO_ACUSADO']
+                      )
+            if not ((cmp_dup in res1) or (self.blank_fields(cmp_emp))):
                 id += 1
-                res1.append(cmp)
+                res1.append(cmp_dup)
                 formatted = {"id_hecho" : case['ID'], "rol" : case['ACUSADO'], "tipo" : case['TIPO_VEHICULO_ACUSADO'], "marca" : case['MARCA_VEHICULO_ACUSADO'],
-                             "modelo" : case['MODELO_VEHICULO_ACUSADO'], "colectivo" : case['COLECTIVO_ACUSADO'], "interno_colectivo" : case['INTERNO_ACUSADO'], "sexo" : case['SEXO_ACUSADO'],
-                             "edad" : case['EDAD_ACUSADO'], "id" : id
+                             "modelo" : case['MODELO_VEHICULO_ACUSADO'], "colectivo" : case['COLECTIVO_ACUSADO'], "interno_colectivo" : case['INTERNO_ACUSADO'],
+                             "sexo" : case['SEXO_ACUSADO'], "edad" : case['EDAD_ACUSADO'], "id" : id
                             }
                 res2.append(formatted)
         ordrd_cols = ["id_hecho", "rol", "tipo", "marca", "modelo", "colectivo", "interno_colectivo", "sexo", "edad", "id"]
         self.dicts_to_csv_ordrd(res2, ordrd_cols)
+
+
+    def blank_fields(self, str_fields):
+        res = ''
+        for field in str_fields:
+            res += field
+        return res.__len__() == 0
 
 
     def dicts_to_csv_ordrd(self, row_dict_list, column_lst):
