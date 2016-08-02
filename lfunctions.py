@@ -119,8 +119,8 @@ class DbPfDg:
         id = int(query.all().__getitem__(0)[0])
         # create a tuple with the fields of each row to compare and check them to avoid adding duplicate entries
         for case in rows:
-            cmp_dup = (case['ID'], case['EDAD_ACUSADO'], case['SEXO_ACUSADO'], case['ACUSADO'], case['TIPO_VEHICULO_ACUSADO'], case['MARCA_VEHICULO_ACUSADO'], case['MODELO_VEHICULO_ACUSADO'])
-            cmp_emp = (case['EDAD_ACUSADO'], case['SEXO_ACUSADO'], case['ACUSADO'], case['TIPO_VEHICULO_ACUSADO'], case['MARCA_VEHICULO_ACUSADO'], case['MODELO_VEHICULO_ACUSADO'],
+            cmp_dup = (case['ID'], case['CAUSA'], case['EDAD_ACUSADO'], case['SEXO_ACUSADO'], case['ACUSADO'], case['TIPO_VEHICULO_ACUSADO'], case['MARCA_VEHICULO_ACUSADO'], case['MODELO_VEHICULO_ACUSADO'])
+            cmp_emp = (case['CAUSA'], case['EDAD_ACUSADO'], case['SEXO_ACUSADO'], case['ACUSADO'], case['TIPO_VEHICULO_ACUSADO'], case['MARCA_VEHICULO_ACUSADO'], case['MODELO_VEHICULO_ACUSADO'],
                        case['COLECTIVO_ACUSADO'], case['INTERNO_ACUSADO']
                       )
             if not ((cmp_dup in res1) or (self.blank_fields(cmp_emp))):
