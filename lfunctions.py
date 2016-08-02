@@ -9,15 +9,15 @@ class DbPfDg:
 
 
     def process_csv(self, csv_path):
-        self.normalize_accidents_ids(csv_path)
-        self.normalize_initial_values_lst(csv_path)
-        self.gen_accidents_table(csv_path)
-        self.gen_victims_table(csv_path)
-        self.gen_accuseds_table(csv_path)
-
-
-    def normalize_accidents_ids(self, csv_path):
         dict_lst = functions.csv_to_dict_list(csv_path)
+        dict_lst = self.normalize_accidents_ids(dict_lst)
+        dict_lst = self.normalize_initial_values_lst(dict_lst)
+        self.gen_accidents_table(dict_lst)
+        self.gen_victims_table(dict_lst)
+        self.gen_accuseds_table(dict_lst)
+
+
+    def normalize_accidents_ids(self, dict_lst):
         query = functions.db.query('select max(id) from hechos')
         newid = int(query.all().__getitem__(0)[0])
         rec = {}
@@ -29,18 +29,17 @@ class DbPfDg:
             else:
                 newid += 1
                 rec[original_id] = newid
-            dict['ID'] = newid
+            dict['ID'] = str(newid)
             res.append(dict)
-        functions.dicts_to_csv(res)
+        return res
 
 
-    def normalize_initial_values_lst(self, csv_path):
-        dict_lst = functions.csv_to_dict_list(csv_path)
+    def normalize_initial_values_lst(self, dict_lst):
         res = []
         for dict in dict_lst:
             dn = self.normalize_initial_values(dict)
             res.append(dn)
-        functions.dicts_to_csv(res)
+        return res
 
 
     def normalize_initial_values(self, dict):
@@ -68,8 +67,7 @@ class DbPfDg:
         return dict
 
 
-    def gen_accidents_table(self, csv_path):
-        rows = functions.csv_to_dict_list(csv_path)
+    def gen_accidents_table(self, rows):
         res1 = []
         res2 = []
         # create a tuple with the fields of each row to compare and check them to avoid adding duplicate entries
@@ -91,8 +89,7 @@ class DbPfDg:
         self.dicts_to_csv_ordrd(res2, ordrd_cols, 'hechos')
 
 
-    def gen_victims_table(self, csv_path):
-        rows = functions.csv_to_dict_list(csv_path)
+    def gen_victims_table(self, rows):
         res1 = []
         res2 = []
         query = functions.db.query('select max(id) from victimas')
@@ -115,8 +112,7 @@ class DbPfDg:
         self.dicts_to_csv_ordrd(res2, ordrd_cols, 'victimas')
 
 
-    def gen_accuseds_table(self, csv_path):
-        rows = functions.csv_to_dict_list(csv_path)
+    def gen_accuseds_table(self, rows):
         res1 = []
         res2 = []
         query = functions.db.query('select max(id) from acusados')
