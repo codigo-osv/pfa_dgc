@@ -17,9 +17,8 @@ subprocess.call(['pg_dump', '--format=t', '--dbname=pfa_dgc', '--file=' + ARCHIV
 flist = os.listdir(PATH)
 rng = datetime.datetime.now() - datetime.timedelta(days=15)
 for file in flist:
-    lmod = os.stat(file).st_mtime
+    wp = PATH + file
+    lmod = os.stat(wp).st_mtime
     dlmod = datetime.datetime.fromtimestamp(lmod)
-    old = dlmod < rng
-    if old:
-        wp = PATH + file
-        os.remove(wp)
+    if dlmod < rng:
+       os.remove(wp)

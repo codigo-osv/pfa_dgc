@@ -8,6 +8,14 @@ import recoding
 class DbPfDg:
 
 
+    def process_csv(self, csv_path):
+        self.normalize_accidents_ids(csv_path)
+        self.normalize_initial_values_lst(csv_path)
+        self.gen_accidents_table(csv_path)
+        self.gen_victims_table(csv_path)
+        self.gen_accuseds_table(csv_path)
+
+
     def normalize_accidents_ids(self, csv_path):
         dict_lst = functions.csv_to_dict_list(csv_path)
         query = functions.db.query('select max(id) from hechos')
@@ -80,7 +88,7 @@ class DbPfDg:
         ordrd_cols = ["orden", "id", "mes", "comisaria", "fecha", "hora", "tipo_colision", "tipo_hecho", "lugar_hecho", "direccion_normalizada", "tipo_calle",
                       "direccion_normalizada_arcgis", "calle1", "altura", "calle2", "codigo_calle", "codigo_cruce", "geocodificacion"
                      ]
-        self.dicts_to_csv_ordrd(res2, ordrd_cols)
+        self.dicts_to_csv_ordrd(res2, ordrd_cols, 'hechos')
 
 
     def gen_victims_table(self, csv_path):
@@ -104,7 +112,7 @@ class DbPfDg:
                             }
                 res2.append(formatted)
         ordrd_cols = ["id_hecho", "causa", "rol", "tipo", "marca", "modelo", "colectivo", "interno_colectivo", "sexo", "edad", "sumario", "id"]
-        self.dicts_to_csv_ordrd(res2, ordrd_cols)
+        self.dicts_to_csv_ordrd(res2, ordrd_cols, 'victimas')
 
 
     def gen_accuseds_table(self, csv_path):
@@ -128,7 +136,7 @@ class DbPfDg:
                             }
                 res2.append(formatted)
         ordrd_cols = ["id_hecho", "rol", "tipo", "marca", "modelo", "colectivo", "interno_colectivo", "sexo", "edad", "id"]
-        self.dicts_to_csv_ordrd(res2, ordrd_cols)
+        self.dicts_to_csv_ordrd(res2, ordrd_cols, 'acusados')
 
 
     def blank_fields(self, str_fields):
@@ -138,19 +146,20 @@ class DbPfDg:
         return res.__len__() == 0
 
 
-    def dicts_to_csv_ordrd(self, row_dict_list, column_lst):
+    def dicts_to_csv_ordrd(self, row_dict_list, column_lst, destnm):
         #precondition: all rows have the same columns
-        with open('resultado.csv', 'w') as fh:
+        destf = destnm + '.csv'
+        with open(destf, 'w') as fh:
             wr = csv.DictWriter(fh, fieldnames=column_lst, delimiter=',', extrasaction='ignore', lineterminator='\n')
             wr.writeheader()
             for row in row_dict_list:
                 wr.writerow(row)
 
 
-    def merge_csvs_ordrd(self, column_lst, *csv_path):
+    def merge_csvs_ordrd(self, column_lst, destnm, *csv_path):
         #precondition: all csvs and all rows have the same columns
         rec = []
         for csv in csv_path:
             rec.append(functions.csv_to_dict_list(csv))
         flattened = list(chain.from_iterable(rec))
-        self.dicts_to_csv_ordrd(flattened, column_lst)
+        self.dicts_to_csv_ordrd(flattened, column_lst, destnm)
