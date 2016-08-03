@@ -6,8 +6,12 @@ import recoding
 
 
 class DbPfDg:
-    def process_csv(self, csv_path):
-        dict_lst = functions.csv_to_dict_list(csv_path)
+
+    def __init__(self, csv_path):
+        self.csv_path = csv_path
+
+    def process_csv(self):
+        dict_lst = functions.csv_to_dict_list(self.csv_path)
         dict_lst = self.normalize_accidents_ids(dict_lst)
         dict_lst = self.normalize_initial_values_lst(dict_lst)
         self.gen_accidents_table(dict_lst)
