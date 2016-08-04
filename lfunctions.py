@@ -1,6 +1,7 @@
 # -*- coding: UTF-8 -*-
 import csv
 from itertools import chain
+from psycopg2._psycopg import AsIs
 import functions
 import recoding
 
@@ -165,3 +166,11 @@ class DbPfDg:
             rec.append(functions.csv_to_dict_list(fcsv))
         flattened = list(chain.from_iterable(rec))
         self.dicts_to_csv_ordrd(flattened, column_lst, destnm)
+
+    def upd_xy(self):
+        dict_lst = functions.csv_to_dict_list(self.csv_path)
+        cur = functions.psycodb.cursor()
+        for adict in dict_lst:
+            cur.execute("update hechos set %s = %s, %s = %s where id = %s;",
+                        (AsIs('x'), adict['POINT_X'], AsIs('y'), adict['POINT_Y'], adict['id']))
+            functions.psycodb.commit()
