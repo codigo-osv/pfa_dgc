@@ -10,6 +10,7 @@ class DbPfDg:
 
     def __init__(self, csv_path):
         self.csv_path = csv_path
+        self.auxfuncts = AuxF()
 
     def process_csv(self):
         dict_lst = functions.csv_to_dict_list(self.csv_path)
@@ -19,7 +20,8 @@ class DbPfDg:
         self.gen_victims_table(dict_lst)
         self.gen_accuseds_table(dict_lst)
 
-    def normalize_accidents_ids(self, dict_lst):
+    @staticmethod
+    def normalize_accidents_ids(dict_lst):
         query = functions.db.query('select max(id) from hechos')
         newid = int(query.all().__getitem__(0)[0])
         rec = {}
@@ -42,7 +44,8 @@ class DbPfDg:
             res.append(dn)
         return res
 
-    def normalize_initial_values(self, adict):
+    @staticmethod
+    def normalize_initial_values(adict):
         for key in adict.keys():
             if recoding.is_no_data(adict[key]):
                 adict[key] = ''
@@ -90,7 +93,7 @@ class DbPfDg:
                       "direccion_normalizada", "tipo_calle",
                       "direccion_normalizada_arcgis", "calle1", "altura", "calle2", "codigo_calle", "codigo_cruce",
                       "geocodificacion"]
-        self.dicts_to_csv_ordrd(res2, ordrd_cols, 'hechos')
+        self.auxfuncts.dicts_to_csv_ordrd(res2, ordrd_cols, 'hechos')
 
     def gen_victims_table(self, rows):
         res1 = []
@@ -105,7 +108,7 @@ class DbPfDg:
                        case['TIPO_VEHICULO_VICTIMA'],
                        case['MARCA_VEHICULO_VICTIMA'], case['MODELO_VEHICULO_VICTIMA'], case['COLECTIVO_VICTIMA'],
                        case['INTERNO_VICTIMA'])
-            if not ((cmp_dup in res1) or (self.blank_fields(cmp_emp))):
+            if not ((cmp_dup in res1) or (self.auxfuncts.blank_fields(cmp_emp))):
                 lstid += 1
                 res1.append(cmp_dup)
                 formatted = {"id_hecho": case['ID'], "causa": case['CAUSA'], "rol": case['VICTIMA'],
@@ -116,7 +119,7 @@ class DbPfDg:
                 res2.append(formatted)
         ordrd_cols = ["id_hecho", "causa", "rol", "tipo", "marca", "modelo", "colectivo", "interno_colectivo", "sexo",
                       "edad", "sumario", "id"]
-        self.dicts_to_csv_ordrd(res2, ordrd_cols, 'victimas')
+        self.auxfuncts.dicts_to_csv_ordrd(res2, ordrd_cols, 'victimas')
 
     def gen_accuseds_table(self, rows):
         res1 = []
@@ -131,7 +134,7 @@ class DbPfDg:
                        case['TIPO_VEHICULO_ACUSADO'],
                        case['MARCA_VEHICULO_ACUSADO'], case['MODELO_VEHICULO_ACUSADO'],
                        case['COLECTIVO_ACUSADO'], case['INTERNO_ACUSADO'])
-            if not ((cmp_dup in res1) or (self.blank_fields(cmp_emp))):
+            if not ((cmp_dup in res1) or (self.auxfuncts.blank_fields(cmp_emp))):
                 lstid += 1
                 res1.append(cmp_dup)
                 formatted = {"id_hecho": case['ID'], "rol": case['ACUSADO'], "tipo": case['TIPO_VEHICULO_ACUSADO'],
@@ -142,15 +145,28 @@ class DbPfDg:
                 res2.append(formatted)
         ordrd_cols = ["id_hecho", "rol", "tipo", "marca", "modelo", "colectivo", "interno_colectivo", "sexo", "edad",
                       "id"]
-        self.dicts_to_csv_ordrd(res2, ordrd_cols, 'acusados')
+        self.auxfuncts.dicts_to_csv_ordrd(res2, ordrd_cols, 'acusados')
 
-    def blank_fields(self, str_fields):
+    def upd_xy(self):
+        dict_lst = functions.csv_to_dict_list(self.csv_path)
+        cur = functions.psycodb.cursor()
+        for adict in dict_lst:
+            cur.execute("update hechos set %s = %s, %s = %s where id = %s;",
+                        (AsIs('x'), adict['POINT_X'], AsIs('y'), adict['POINT_Y'], adict['id']))
+            functions.psycodb.commit()
+
+
+class AuxF:
+
+    @staticmethod
+    def blank_fields(str_fields):
         res = ''
         for field in str_fields:
             res += field
         return res.__len__() == 0
 
-    def dicts_to_csv_ordrd(self, row_dict_list, column_lst, destnm):
+    @staticmethod
+    def dicts_to_csv_ordrd(row_dict_list, column_lst, destnm):
         # precondition: all rows have the same columns
         destf = destnm + '.csv'
         with open(destf, 'w') as fh:
@@ -166,11 +182,3 @@ class DbPfDg:
             rec.append(functions.csv_to_dict_list(fcsv))
         flattened = list(chain.from_iterable(rec))
         self.dicts_to_csv_ordrd(flattened, column_lst, destnm)
-
-    def upd_xy(self):
-        dict_lst = functions.csv_to_dict_list(self.csv_path)
-        cur = functions.psycodb.cursor()
-        for adict in dict_lst:
-            cur.execute("update hechos set %s = %s, %s = %s where id = %s;",
-                        (AsIs('x'), adict['POINT_X'], AsIs('y'), adict['POINT_Y'], adict['id']))
-            functions.psycodb.commit()
