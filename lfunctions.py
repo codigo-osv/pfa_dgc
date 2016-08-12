@@ -18,7 +18,7 @@ class DbPfDg:
         dict_lst = self.normalize_initial_values_lst(dict_lst)
         self.gen_accidents_table(dict_lst)
         self.gen_victims_table(dict_lst)
-        self.gen_accuseds_table(dict_lst)
+        self.gen_accused_table(dict_lst)
 
     @staticmethod
     def normalize_accidents_ids(dict_lst):
@@ -121,7 +121,7 @@ class DbPfDg:
                       "edad", "sumario", "id"]
         self.auxfuncts.dicts_to_csv_ordrd(res2, ordrd_cols, 'victimas')
 
-    def gen_accuseds_table(self, rows):
+    def gen_accused_table(self, rows):
         res1 = []
         res2 = []
         query = functions.db.query('select max(id) from acusados')
