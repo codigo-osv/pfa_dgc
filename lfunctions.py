@@ -22,8 +22,11 @@ class DbPfDg:
 
     @staticmethod
     def normalize_accidents_ids(dict_lst):
-        query = functions.db.query('select max(id) from hechos')
-        newid = int(query.all().__getitem__(0)[0])
+        # query = functions.db.query('select max(id) from hechos')
+        # newid = int(query.all().__getitem__(0)[0])
+        cur = functions.psycodb.cursor()
+        cur.execute('select max(id) from hechos')
+        newid = int(cur.fetchone()[0])
         rec = {}
         res = []
         for adict in dict_lst:
@@ -98,8 +101,11 @@ class DbPfDg:
     def gen_victims_table(self, rows):
         res1 = []
         res2 = []
-        query = functions.db.query('select max(id) from victimas')
-        lstid = int(query.all().__getitem__(0)[0])
+        # query = functions.db.query('select max(id) from victimas')
+        # lstid = int(query.all().__getitem__(0)[0])
+        cur = functions.psycodb.cursor()
+        cur.execute('select max(id) from victimas')
+        lstid = int(cur.fetchone()[0])
         # create a tuple with the fields of each row to compare and check them to avoid adding duplicate entries
         for case in rows:
             cmp_dup = (case['ID'], case['CAUSA'], case['EDAD_VICTIMA'], case['SEXO_VICTIMA'], case['VICTIMA'],
@@ -124,8 +130,11 @@ class DbPfDg:
     def gen_accused_table(self, rows):
         res1 = []
         res2 = []
-        query = functions.db.query('select max(id) from acusados')
-        lstid = int(query.all().__getitem__(0)[0])
+        # query = functions.db.query('select max(id) from acusados')
+        # lstid = int(query.all().__getitem__(0)[0])
+        cur = functions.psycodb.cursor()
+        cur.execute('select max(id) from acusados')
+        lstid = int(cur.fetchone()[0])
         # create a tuple with the fields of each row to compare and check them to avoid adding duplicate entries
         for case in rows:
             cmp_dup = (case['ID'], case['CAUSA'], case['EDAD_ACUSADO'], case['SEXO_ACUSADO'], case['ACUSADO'],
