@@ -1,5 +1,4 @@
 # -*- coding: UTF-8 -*-
-import six
 import analysis
 import functions
 import pandas
