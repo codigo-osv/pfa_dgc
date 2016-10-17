@@ -7,12 +7,19 @@ import lfunctions
 
 class TestStringMethods(unittest.TestCase):
 
-    def setUp(self):
+    @classmethod
+    def setUpClass(self):
         self.cur = functions.psycodb.cursor()
         self.auxf = lfunctions.AuxF()
 
     def test_db_connection(self):
         self.assertEquals(functions.psycodb.closed, 0)
+
+    def test_multiple_cursors_for_same_db_session(self):
+        curB = functions.psycodb.cursor()
+        self.cur.execute('create temp table test0 as (select 0)')
+        curB.execute('select * from test0')
+        self.assertEquals(curB.fetchone()[0], 0)
 
     def test_blank_fields(self):
         a = self.auxf.blank_fields(['', '    ', ' '])
