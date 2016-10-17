@@ -6,7 +6,7 @@ import functions
 import recoding
 
 
-class DbPfDg:
+class Normalize_PFA:
 
     def __init__(self, csv_path):
         self.csv_path = csv_path
@@ -172,7 +172,7 @@ class AuxF:
         res = ''
         for field in str_fields:
             res += field
-        return res.__len__() == 0
+        return (res.__len__() == 0) | res.isspace()
 
     @staticmethod
     def dicts_to_csv_ordrd(row_dict_list, column_lst, destnm):

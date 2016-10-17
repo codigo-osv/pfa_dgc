@@ -8,6 +8,13 @@ import psycopg2.extras
 import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
 
+dtf1 = pandas.read_sql_query('select * from hechos;', functions.psycodb)
+dtf2 = pandas.read_sql_query('select * from victimas order by id_hecho;', functions.psycodb)
+dtf3 = pandas.read_sql_query('select * from acusados order by id_hecho;', functions.psycodb)
+with pandas.ExcelWriter('base_pfa_2006-15.xlsx') as writer:
+    dtf1.to_excel(writer, sheet_name='Siniestros', index=False)
+    dtf2.to_excel(writer, sheet_name='Víctimas', index=False)
+    dtf3.to_excel(writer, sheet_name='Acusados', index=False)
 
 # dtf = pandas.read_sql_query('select id, anio from hechos limit 10;', functions.psycodb)
 # print(dtf)
@@ -53,29 +60,29 @@ import matplotlib.patches as mpatches
 # plt.show(dtg)
 
 # template 2x3 categorical horizontal bars
-d2014_15 = pandas.read_sql_query('select anio, sexo, count(*) as Cantidad from victimas join hechos on '
-                                'victimas.id_hecho = hechos.id where anio = 2014 or anio = 2015 '
-                                'group by anio, sexo order by anio, sexo;',
-                                functions.psycodb, index_col='anio')
-
-labels = ['2014 Femenino','2014 Masculino','2014 Sin datos','2015 Femenino','2015 Masculino', '2015 Sin datos']
-plt.rcParams["figure.facecolor"]='white'
-plt.rcParams["axes.facecolor"]='lightgray'
-plt.rcParams["savefig.facecolor"]='white'
-plt.rcParams['figure.figsize'] = 15, 10
-dtg = d2014_15.plot.barh(title='Número de víctimas según sexo. Años 2014 y 2015.', color=['bgm'])
-plt.yticks(range(len(d2014_15)), rotation='horizontal')
-dtg.grid(True, color='gray', linestyle='solid')
-dtg.legend(loc='upper right')
-blue_patch = mpatches.Patch(color='b', label='Femenino')
-green_patch = mpatches.Patch(color='g', label='Masculino')
-pur_patch = mpatches.Patch(color='m', label='Sin datos')
-plt.legend(handles=[blue_patch, green_patch, pur_patch])
-plt.ylabel('Año')
-plt.xlabel('Cantidad')
-dtg.set_axisbelow(True)
-# plt.show(dtg)
-plt.savefig('horizontal_bars.png', dpi=199, frameon=True)
+# d2014_15 = pandas.read_sql_query('select anio, sexo, count(*) as Cantidad from victimas join hechos on '
+#                                 'victimas.id_hecho = hechos.id where anio = 2014 or anio = 2015 '
+#                                 'group by anio, sexo order by anio, sexo;',
+#                                 functions.psycodb, index_col='anio')
+#
+# labels = ['2014 Femenino','2014 Masculino','2014 Sin datos','2015 Femenino','2015 Masculino', '2015 Sin datos']
+# plt.rcParams["figure.facecolor"]='white'
+# plt.rcParams["axes.facecolor"]='lightgray'
+# plt.rcParams["savefig.facecolor"]='white'
+# plt.rcParams['figure.figsize'] = 15, 10
+# dtg = d2014_15.plot.barh(title='Número de víctimas según sexo. Años 2014 y 2015.', color=['bgm'])
+# plt.yticks(range(len(d2014_15)), rotation='horizontal')
+# dtg.grid(True, color='gray', linestyle='solid')
+# dtg.legend(loc='upper right')
+# blue_patch = mpatches.Patch(color='b', label='Femenino')
+# green_patch = mpatches.Patch(color='g', label='Masculino')
+# pur_patch = mpatches.Patch(color='m', label='Sin datos')
+# plt.legend(handles=[blue_patch, green_patch, pur_patch])
+# plt.ylabel('Año')
+# plt.xlabel('Cantidad')
+# dtg.set_axisbelow(True)
+# # plt.show(dtg)
+# plt.savefig('horizontal_bars.png', dpi=199, frameon=True)
 
 # template pie bar with categorical variable
 # plt.rcParams["figure.facecolor"]='white'
