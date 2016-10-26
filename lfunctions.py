@@ -1,6 +1,8 @@
 # -*- coding: UTF-8 -*-
 import csv
 from itertools import chain
+
+import pandas
 from psycopg2._psycopg import AsIs
 import functions
 import recoding
@@ -10,7 +12,7 @@ class Normalize_PFA:
 
     def __init__(self, csv_path):
         self.csv_path = csv_path
-        self.auxfuncts = AuxF()
+        self.aux_csv = AuxFCSV()
 
     def process_csv(self):
         dict_lst = functions.csv_to_dict_list(self.csv_path)
@@ -96,7 +98,7 @@ class Normalize_PFA:
                       "direccion_normalizada", "tipo_calle",
                       "direccion_normalizada_arcgis", "calle1", "altura", "calle2", "codigo_calle", "codigo_cruce",
                       "geocodificacion"]
-        self.auxfuncts.dicts_to_csv_ordrd(res2, ordrd_cols, 'hechos')
+        self.aux_csv.dicts_to_csv_ordrd(res2, ordrd_cols, 'hechos')
 
     def gen_victims_table(self, rows):
         res1 = []
@@ -114,7 +116,7 @@ class Normalize_PFA:
                        case['TIPO_VEHICULO_VICTIMA'],
                        case['MARCA_VEHICULO_VICTIMA'], case['MODELO_VEHICULO_VICTIMA'], case['COLECTIVO_VICTIMA'],
                        case['INTERNO_VICTIMA'])
-            if not ((cmp_dup in res1) or (self.auxfuncts.blank_fields(cmp_emp))):
+            if not ((cmp_dup in res1) or (self.aux_csv.blank_fields(cmp_emp))):
                 lstid += 1
                 res1.append(cmp_dup)
                 formatted = {"id_hecho": case['ID'], "causa": case['CAUSA'], "rol": case['VICTIMA'],
@@ -125,7 +127,7 @@ class Normalize_PFA:
                 res2.append(formatted)
         ordrd_cols = ["id_hecho", "causa", "rol", "tipo", "marca", "modelo", "colectivo", "interno_colectivo", "sexo",
                       "edad", "sumario", "id"]
-        self.auxfuncts.dicts_to_csv_ordrd(res2, ordrd_cols, 'victimas')
+        self.aux_csv.dicts_to_csv_ordrd(res2, ordrd_cols, 'victimas')
 
     def gen_accused_table(self, rows):
         res1 = []
@@ -143,7 +145,7 @@ class Normalize_PFA:
                        case['TIPO_VEHICULO_ACUSADO'],
                        case['MARCA_VEHICULO_ACUSADO'], case['MODELO_VEHICULO_ACUSADO'],
                        case['COLECTIVO_ACUSADO'], case['INTERNO_ACUSADO'])
-            if not ((cmp_dup in res1) or (self.auxfuncts.blank_fields(cmp_emp))):
+            if not ((cmp_dup in res1) or (self.aux_csv.blank_fields(cmp_emp))):
                 lstid += 1
                 res1.append(cmp_dup)
                 formatted = {"id_hecho": case['ID'], "rol": case['ACUSADO'], "tipo": case['TIPO_VEHICULO_ACUSADO'],
@@ -154,7 +156,7 @@ class Normalize_PFA:
                 res2.append(formatted)
         ordrd_cols = ["id_hecho", "rol", "tipo", "marca", "modelo", "colectivo", "interno_colectivo", "sexo", "edad",
                       "id"]
-        self.auxfuncts.dicts_to_csv_ordrd(res2, ordrd_cols, 'acusados')
+        self.aux_csv.dicts_to_csv_ordrd(res2, ordrd_cols, 'acusados')
 
     def upd_xy(self):
         dict_lst = functions.csv_to_dict_list(self.csv_path)
@@ -165,7 +167,7 @@ class Normalize_PFA:
             functions.psycodb.commit()
 
 
-class AuxF:
+class AuxFCSV:
 
     @staticmethod
     def blank_fields(str_fields):
@@ -191,3 +193,15 @@ class AuxF:
             rec.append(functions.csv_to_dict_list(fcsv))
         flattened = list(chain.from_iterable(rec))
         self.dicts_to_csv_ordrd(flattened, column_lst, destnm)
+
+
+class PdaUtils:
+
+    @staticmethod
+    def dframes_to_excel_sheets(data_frames, sheet_names, file_name):
+        # precondition: [data_frames].size() = [sheet_names].size()
+        ct = 0
+        with pandas.ExcelWriter(file_name + '.xlsx') as writer:
+            for df in data_frames:
+                df.to_excel(writer, sheet_name=sheet_names[ct], index=False)
+                ct += 1

@@ -10,7 +10,7 @@ class TestStringMethods(unittest.TestCase):
     @classmethod
     def setUpClass(self):
         self.cur = functions.psycodb.cursor()
-        self.auxf = lfunctions.AuxF()
+        self.auxf = lfunctions.AuxFCSV()
 
     def test_db_connection(self):
         self.assertEquals(functions.psycodb.closed, 0)
