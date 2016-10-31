@@ -4,13 +4,11 @@ import unittest
 import functions
 import lfunctions
 
-
-class TestStringMethods(unittest.TestCase):
+class TestDBMethods(unittest.TestCase):
 
     @classmethod
     def setUpClass(self):
         self.cur = functions.psycodb.cursor()
-        self.auxf = lfunctions.AuxFCSV()
 
     def test_db_connection(self):
         self.assertEquals(functions.psycodb.closed, 0)
@@ -20,6 +18,13 @@ class TestStringMethods(unittest.TestCase):
         self.cur.execute('create temp table test0 as (select 0)')
         curB.execute('select * from test0')
         self.assertEquals(curB.fetchone()[0], 0)
+
+
+class TestStringMethods(unittest.TestCase):
+
+    @classmethod
+    def setUpClass(self):
+        self.auxf = lfunctions.AuxFCSV()
 
     def test_blank_fields(self):
         a = self.auxf.blank_fields(['', '    ', ' '])
