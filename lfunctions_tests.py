@@ -1,23 +1,21 @@
 import csv
 import os
 import unittest
-import functions
+import dbconnections
 import lfunctions
 import pandas
 import xlrd
 
-
-
-@unittest.skipIf(functions.psycopg2_not_connected,"psycopg2 adapter not connected to the database atm and "
-                                                  "it is necessary for the tests in this class")
+@unittest.skipIf(dbconnections.psycopg2_not_connected, "psycopg2 adapter not connected to the database atm and "
+                                                       "it is necessary for the tests in this class")
 class TestDBMethods(unittest.TestCase):
 
     @classmethod
     def setUpClass(self):
-        self.cur = functions.psycodb95.cursor()
+        self.cur = dbconnections.psycodb95.cursor()
 
     def test_multiple_cursors_for_same_db_session(self):
-        curB = functions.psycodb95.cursor()
+        curB = dbconnections.psycodb95.cursor()
         self.cur.execute('create temp table test0 as (select 0)')
         curB.execute('select * from test0')
         self.assertEquals(curB.fetchone()[0], 0)
@@ -58,13 +56,13 @@ class TestStringMethods(unittest.TestCase):
         os.remove('test2.csv')
 
 
-@unittest.skipIf(functions.psycopg2_not_connected, "psycopg2 adapter not connected to the database atm and "
-                                                   "it is necessary for the tests in this class")
+@unittest.skipIf(dbconnections.psycopg2_not_connected, "psycopg2 adapter not connected to the database atm and "
+                                                       "it is necessary for the tests in this class")
 class TestPandasUtils(unittest.TestCase):
 
     @classmethod
     def setUpClass(self):
-        self.eng = functions.psycodb95
+        self.eng = dbconnections.psycodb95
         self.auxf = lfunctions.PdaUtils
 
     def setUp(self):
@@ -82,4 +80,3 @@ class TestPandasUtils(unittest.TestCase):
     @classmethod
     def tearDownClass(self):
         os.remove('testdf.xlsx')
-

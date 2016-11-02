@@ -4,6 +4,8 @@ from itertools import chain
 
 import pandas
 from psycopg2._psycopg import AsIs
+
+import dbconnections
 import functions
 import recoding
 
@@ -26,7 +28,7 @@ class Normalize_PFA:
     def normalize_accidents_ids(dict_lst):
         # query = functions.db.query('select max(id) from hechos')
         # newid = int(query.all().__getitem__(0)[0])
-        cur = functions.psycodb.cursor()
+        cur = dbconnections.psycodb.cursor()
         cur.execute('select max(id) from hechos')
         newid = int(cur.fetchone()[0])
         rec = {}
@@ -105,7 +107,7 @@ class Normalize_PFA:
         res2 = []
         # query = functions.db.query('select max(id) from victimas')
         # lstid = int(query.all().__getitem__(0)[0])
-        cur = functions.psycodb.cursor()
+        cur = dbconnections.psycodb.cursor()
         cur.execute('select max(id) from victimas')
         lstid = int(cur.fetchone()[0])
         # create a tuple with the fields of each row to compare and check them to avoid adding duplicate entries
@@ -134,7 +136,7 @@ class Normalize_PFA:
         res2 = []
         # query = functions.db.query('select max(id) from acusados')
         # lstid = int(query.all().__getitem__(0)[0])
-        cur = functions.psycodb.cursor()
+        cur = dbconnections.psycodb.cursor()
         cur.execute('select max(id) from acusados')
         lstid = int(cur.fetchone()[0])
         # create a tuple with the fields of each row to compare and check them to avoid adding duplicate entries
@@ -160,11 +162,11 @@ class Normalize_PFA:
 
     def upd_xy(self):
         dict_lst = functions.csv_to_dict_list(self.csv_path)
-        cur = functions.psycodb.cursor()
+        cur = dbconnections.psycodb.cursor()
         for adict in dict_lst:
             cur.execute("update hechos set %s = %s, %s = %s where id = %s;",
                         (AsIs('x'), adict['POINT_X'], AsIs('y'), adict['POINT_Y'], adict['id']))
-            functions.psycodb.commit()
+            dbconnections.psycodb.commit()
 
 
 class AuxFCSV:
