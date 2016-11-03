@@ -1,6 +1,6 @@
 .idea/
-analysis.py
-functions.py
+
+
 *.pyc
 main.py
 *.csv
